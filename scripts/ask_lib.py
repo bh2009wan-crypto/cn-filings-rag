@@ -47,14 +47,26 @@ STRICT_TAIL = """
 请按规则作答（每个数字后带 [n] 角标）。"""
 
 
-def _num_tokens(s: str) -> set[str]:
-    """抽出答案里的数字（含千分位与百分数），用于"数字是否在原文里"的核对。"""
-    out = set()
-    for m in re.finditer(r"\d[\d,]*\.?\d*", s):
-        t = m.group(0).replace(",", "").rstrip(".")
-        if len(t.replace(".", "")) >= 3:          # 只看 3 位以上的数，避免"1、2"这类噪声
-            out.add(t)
-    return out
+def _num_tokens(s: str) -> tuple[set[str], set[str]]:
+    """抽出答案里的数字，分成两组：
+
+    · 需要核对的：原样引用财报的数字（必须能在检索块里找到）
+    · 豁免的：4 位年份（19xx/20xx）、以及答案自己算出来的数（前面有 ≈/约/为 … 计算值）
+
+    实测踩到过：`2026年上半年` 里的 2026、以及 `≈41.44%` 这种**计算出来**的比率，
+    都会被朴素核对判成"原文没有"，把好答案误标成可疑。这里显式区分，而不是放宽阈值。
+    """
+    need, exempt = set(), set()
+    for m in re.finditer(r"(≈|约|算出|计算得|得到)?\s*(\d[\d,]*\.?\d*)", s):
+        prefix, raw = m.group(1), m.group(2)
+        t = raw.replace(",", "").rstrip(".")
+        if len(t.replace(".", "")) < 3:
+            continue
+        if re.fullmatch(r"(19|20)\d{2}", t):       # 年份
+            exempt.add(t)
+            continue
+        (exempt if prefix else need).add(t)
+    return need, exempt
 
 
 class Retriever:
@@ -202,6 +214,16 @@ class Retriever:
         return out, detail
 
 
+CROSS_HINT = ("哪家", "哪些", "谁", "排名", "最高", "最低", "对比", "所有", "普遍",
+              "各家", "分别", "11 家", "11家", "全部")
+
+
+def _looks_cross_company(q: str) -> bool:
+    """没有点名公司、又在问"哪家/所有/对比"这类 → 判定为跨公司全景题。"""
+    named = re.findall(r"(贵州茅台|五粮液|泸州老窖|山西汾酒|洋河股份|古井贡酒|今世缘|口子窖|迎驾贡酒|老白干酒|金种子酒)", q)
+    return len(set(named)) < 2 and any(k in q for k in CROSS_HINT)
+
+
 def build_context(blocks: list[dict]) -> str:
     out = []
     for i, b in enumerate(blocks, 1):
@@ -216,16 +238,23 @@ def build_context(blocks: list[dict]) -> str:
 
 def answer(q: str, retr: Retriever, mode: str = "auto", top: int = FINAL_TOP,
            model: str = LLM_MODEL) -> dict:
+    # fanout 题（跨公司全景）必须把 11 家都放进窗口：否则就是课件诊断过的
+    # 「挑到了 11 家、窗口只放得下 4 家」。全局题仍按 top 截断。
+    if mode == "fanout" or (mode == "auto" and _looks_cross_company(q)):
+        mode = "fanout"
+        top = max(top, len(COMPANIES) * FANOUT_PER_COMPANY)
     blocks, detail = retr.retrieve(q, mode=mode, top=top)
+    if detail["mode"] == "fanout":
+        detail["window"] = f"fanout 放开到 {len(blocks)} 块（11 家 × {FANOUT_PER_COMPANY}）"
     prompt = SYSTEM + STRICT_TAIL.replace("{context}", build_context(blocks)).replace("{q}", q)
     text = chat([{"role": "user", "content": prompt}], model=model, temperature=0, max_tokens=1200)
 
     # ---- 后置校验 ----
     cites = sorted({int(x) for x in re.findall(r"\[(\d+)\]", text)})
     bad_cites = [c for c in cites if c < 1 or c > len(blocks)]
-    nums_ans = _num_tokens(text)
+    need, exempt = _num_tokens(text)
     joined = " ".join(b["text"] for b in blocks).replace(",", "")
-    unsupported = sorted(n for n in nums_ans if n not in joined)
+    unsupported = sorted(n for n in need if n not in joined)
     return {
         "question": q, "answer": text, "mode": detail["mode"],
         "n_blocks": len(blocks),
@@ -236,8 +265,8 @@ def answer(q: str, retr: Retriever, mode: str = "auto", top: int = FINAL_TOP,
                        "table_title": blocks[c - 1].get("table_title")}
                       for c in cites if 1 <= c <= len(blocks)],
         "invalid_citations": bad_cites,
-        "number_check": {"checked": len(nums_ans), "unsupported": unsupported[:12],
-                         "ok": len(unsupported) == 0},
+        "number_check": {"checked": len(need), "exempt": sorted(exempt),
+                         "unsupported": unsupported[:12], "ok": len(unsupported) == 0},
         "blocks": [{k: b.get(k) for k in ("chunk_id", "company", "section", "printed_page",
                                           "table_title", "type", "bm25_rank", "vec_rank",
                                           "index_text")} | {"text": b["text"][:800]}
