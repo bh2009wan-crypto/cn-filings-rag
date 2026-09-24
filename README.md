@@ -8,7 +8,7 @@
 
 | # | 交付物 | 状态 |
 |---|---|---|
-| A | 代码仓库（本仓库，私有） | ✅ `github.com/bh2009wan-crypto/homework3` |
+| A | 代码仓库（本仓库，私有） | ✅ `github.com/bh2009wan-crypto/cn-filings-rag` |
 | A | 11 家 × 2026 半年报的知识库（向量 + BM25） | ✅ 4,462 块，向量 + BM25 双索引 |
 | A | 问答页面（能提问、答案带出处） | ✅ `scripts/08_app.py`（答案带角标 + 证据卡片 + 数字核对） |
 | A | 页面截图 | ✅ `outputs/A_页面截图.png`、`outputs/A_页面截图_回答.png` |
