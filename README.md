@@ -15,7 +15,7 @@
 | A | 10 道题逐题记录（召回块 / 对错 / 错在哪） | ✅ `outputs/eval/results_a.csv`（含人工判分列） |
 | A | 一页结论 | ✅ `docs/结论A_一页.md`（单公司 8/8，跨公司全景 0/2） |
 | B | 造数据脚本 + 抽检记录 | 数据 ✅（293 条 / 训练 245 / 测试 48）；**抽检需你终审 40 条** `data/sft/review_40.csv` |
-| B | 训练笔记本 | ✅ `notebooks/maotai_dongmi_lora.ipynb`（Colab 免费 T4；数据需手动上传，仓库是私有的） |
+| B | 训练笔记本 | ✅ `notebooks/maotai_dongmi_lora.ipynb`（Colab 免费 T4；数据需手动上传，仓库是私有的）<br>**操作步骤见 `docs/你要做的两步.md`** |
 | B | 四格对照表 + 一页结论 | ⏳ **等你在 Colab 跑完** → 回传 `results_b.json` → 跑 `scripts/22_run_eval_b.py` → 回填 `docs/结论B_一页.md` 第 4 节 |
 
 > 状态如实写：**没跑完的不打勾**。
