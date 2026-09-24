@@ -1,7 +1,14 @@
 # ===== 密钥与日志（绝不入库）=====
 .env
 logs/
-outputs/
+# 注意：写 "outputs/" 会让 git 不再进入该目录，里面的文件就**无法**用 ! 重新包含；
+# 所以这里用 "outputs/*" 再逐类放行（截图与结论是交付物，必须入库）
+outputs/*
+!outputs/*.md
+!outputs/*.png
+outputs/eval/*
+!outputs/eval/*.csv
+!outputs/eval/*.md
 
 # ===== 财报原件与派生的大文件（不入库；README 里写明怎么重新生成）=====
 data/pdf/
