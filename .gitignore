@@ -18,6 +18,9 @@ models/
 !data/sft/qc_report.json
 !data/sft/split_manifest.json
 !outputs/*.md
+!outputs/*.png
+!outputs/eval/*.csv
+!outputs/eval/*.md
 
 # SFT 完整版（含 chunk_text=整页原文）不入库；入库的是 data/sft/git/ 的去原文版本
 data/sft/*.jsonl
