@@ -32,6 +32,9 @@ models/
 
 # SFT 完整版（含 chunk_text=整页原文）不入库；入库的是 data/sft/git/ 的去原文版本
 data/sft/*.jsonl
+# 本地缓存与检索上下文（含财报原文 → 不入库；rag_context.json 由 Colab 手动上传）
+data/sft/qc_cache.json
+data/sft/rag_context.json
 
 # ===== Python =====
 __pycache__/

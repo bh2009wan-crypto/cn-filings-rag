@@ -111,7 +111,18 @@ def stage1(rec: dict) -> tuple[bool, str]:
     return True, "ok"
 
 
-def stage2(rec: dict) -> dict:
+CACHE_FILE = SFT_DIR / "qc_cache.json"
+
+
+def load_cache() -> dict:
+    return json.loads(CACHE_FILE.read_text(encoding="utf-8")) if CACHE_FILE.exists() else {}
+
+
+def stage2(rec: dict, cache: dict) -> dict:
+    """模型质检（开 thinking）。带缓存：同一条问答只花一次钱，重跑只补失败的那些。"""
+    key = rec["chunk_id"] + "|" + rec["问题"][:60]
+    if key in cache and cache[key].get("有据", -1) >= 0:
+        return cache[key]
     prompt = (QC_PROMPT.replace("{chunk}", rec["chunk_text"][:2500])
                         .replace("{q}", rec["问题"]).replace("{a}", rec["答案"]))
     for attempt in range(1, 4):
@@ -119,8 +130,10 @@ def stage2(rec: dict) -> dict:
             d = chat_json([{"role": "user", "content": prompt}], model=LLM_MODEL,
                           temperature=0, max_tokens=500, thinking=True)
             if isinstance(d, dict) and "有据" in d:
-                return {"有据": int(d.get("有据", 0)), "自然": int(d.get("自然", 0)),
-                        "理由": str(d.get("理由", ""))[:120]}
+                out = {"有据": int(d.get("有据", 0)), "自然": int(d.get("自然", 0)),
+                       "理由": str(d.get("理由", ""))[:120]}
+                cache[key] = out
+                return out
         except Exception:
             time.sleep(1.5 * attempt)
     return {"有据": -1, "自然": -1, "理由": "质检调用失败"}
@@ -167,9 +180,11 @@ def main() -> None:
           + ("  ⚠️ 低于 70%：建议把 10_gen_qa.py 改成开 thinking 重新生成" if len(deduped)/max(1,len(rows)) < 0.7 else ""))
 
     # ---- 阶段二 ----
+    cache = load_cache()
+    print(f"  质检缓存命中 {len(cache)} 条（这些不再花钱）")
     out = []
     with ThreadPoolExecutor(max_workers=args.workers) as ex:
-        futs = {ex.submit(stage2, r): r for r in deduped}
+        futs = {ex.submit(stage2, r, cache): r for r in deduped}
         for i, fut in enumerate(as_completed(futs), 1):
             r = futs[fut]
             qc = fut.result()
@@ -179,6 +194,7 @@ def main() -> None:
             if i % 50 == 0 or i == len(deduped):
                 print(f"    质检 {i}/{len(deduped)}，已留 {len(out)}")
 
+    CACHE_FILE.write_text(json.dumps(cache, ensure_ascii=False), encoding="utf-8")
     clean = SFT_DIR / "qa_clean.jsonl"
     with clean.open("w", encoding="utf-8") as f:
         for r in out:
