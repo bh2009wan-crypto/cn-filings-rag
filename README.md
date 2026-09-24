@@ -8,17 +8,33 @@
 
 | # | 交付物 | 状态 |
 |---|---|---|
-| A | 代码仓库（本仓库） | 进行中（等结果齐了一次性提交） |
-| A | 11 家 × 2026 半年报的知识库（向量 + BM25） | 语料/切块/BM25 已好；向量在算 |
-| A | 问答页面（能提问、答案带出处） | 页面与检索链已就绪，等向量算完即可问 |
-| A | 页面截图 | 待生成 `outputs/A_页面截图*.png` |
-| A | 10 道题逐题记录（召回块 / 对错 / 错在哪） | 题目已冻结；等向量算完跑评测 |
-| A | 一页结论 | 待写 `docs/结论A_一页.md` |
-| B | 造数据脚本 + 抽检记录 | 问答对已生成并质检；抽检表与记录待生成（需要你终审 40 条） |
-| B | 训练笔记本 | ✅ `notebooks/maotai_dongmi_lora.ipynb`（Colab 免费 T4 上跑） |
-| B | 四格对照表 + 一页结论 | 待你在 Colab 跑完、把结果回传后生成 |
+| A | 代码仓库（本仓库，私有） | ✅ `github.com/bh2009wan-crypto/homework3` |
+| A | 11 家 × 2026 半年报的知识库（向量 + BM25） | ✅ 4,462 块，向量 + BM25 双索引 |
+| A | 问答页面（能提问、答案带出处） | ✅ `scripts/08_app.py`（答案带角标 + 证据卡片 + 数字核对） |
+| A | 页面截图 | ✅ `outputs/A_页面截图.png`、`outputs/A_页面截图_回答.png` |
+| A | 10 道题逐题记录（召回块 / 对错 / 错在哪） | ✅ `outputs/eval/results_a.csv`（含人工判分列） |
+| A | 一页结论 | ✅ `docs/结论A_一页.md`（单公司 8/8，跨公司全景 0/2） |
+| B | 造数据脚本 + 抽检记录 | 数据 ✅（293 条 / 训练 245 / 测试 48）；**抽检需你终审 40 条** `data/sft/review_40.csv` |
+| B | 训练笔记本 | ✅ `notebooks/maotai_dongmi_lora.ipynb`（Colab 免费 T4；数据需手动上传，仓库是私有的） |
+| B | 四格对照表 + 一页结论 | ⏳ **等你在 Colab 跑完** → 回传 `results_b.json` → 跑 `scripts/22_run_eval_b.py` → 回填 `docs/结论B_一页.md` 第 4 节 |
 
 > 状态如实写：**没跑完的不打勾**。
+
+## 交付物 ↔ 文件对照（交作业时按这张表找）
+
+| 课件要求的交付物 | 文件 |
+|---|---|
+| A · 代码仓库 | 本仓库 |
+| A · 页面截图 | `outputs/A_页面截图.png`（首页）、`outputs/A_页面截图_回答.png`（带证据卡片的回答） |
+| A · 一页结论 | `docs/结论A_一页.md` |
+| A · 10 题逐题记录 | `outputs/eval/results_a.csv`（+ 可复核的判分脚本 `scripts/19_verdict_a.py`） |
+| A · 冻结的题与参考要点 | `eval/questions_a.json`、`eval/questions_a.sha256`、`eval/key_facts.json` |
+| B · 数据生成脚本 | `scripts/10_gen_qa.py`、`scripts/11_qc_qa.py` |
+| B · 人工抽检记录 | `docs/抽检记录.md` + `data/sft/review_40.csv`（**待你填判定列**） |
+| B · 训练笔记本 | `notebooks/maotai_dongmi_lora.ipynb` |
+| B · 对照表 | `outputs/B_对照表.md`（等 Colab 结果） |
+| B · 一页结论 | `docs/结论B_一页.md` |
+| 附 · 踩坑复盘（不在要求里，但对同类项目有用） | `docs/踩坑复盘.md`（14 条） |
 
 ## 课件要求 ↔ 实现 对照
 

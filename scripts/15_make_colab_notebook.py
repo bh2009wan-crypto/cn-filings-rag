@@ -69,25 +69,26 @@ os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"     # HuggingFace 被墙，�
 import transformers, peft, trl
 print("transformers", transformers.__version__, "| peft", peft.__version__, "| trl", trl.__version__)"""),
 
-    code("""# ── 3. 取数据（已入库，直接 wget）───────────────────────────
-# 若仓库改名了，就把四个 jsonl 手动上传到 /content/
-import os, json, urllib.request
+    code("""# ── 3. 取数据 ──────────────────────────────────────────────
+# ⚠️ 仓库是**私有**的，raw 链接取不到 → 请在 Colab 左侧「文件」面板把这 5 个文件上传到 /content/：
+#     data/sft/git/train.jsonl      data/sft/git/test.jsonl
+#     data/sft/git/train_para.jsonl data/sft/git/test_para.jsonl
+#     data/sft/rag_context.json        ← 本机 scripts/16_dump_rag_for_b.py 生成（格5 用；没有就跳过格5）
+# 也可以用 token 拉（可选）：
+#     import subprocess; subprocess.run(["git","clone","https://<token>@github.com/bh2009wan-crypto/homework3.git"])
+import os, json
 FILES = ["train.jsonl", "test.jsonl", "test_para.jsonl", "train_para.jsonl"]
-BASE = "__REPO__/data/sft/"
-for f in FILES:
-    if not os.path.exists(f):
-        try:
-            urllib.request.urlretrieve(BASE + f, f)
-            print("下载", f, os.path.getsize(f), "字节")
-        except Exception as e:
-            print("⚠️ 下载失败，请手动上传：", f, e)
 def load(p):
     return [json.loads(l) for l in open(p, encoding="utf-8") if l.strip()] if os.path.exists(p) else []
+missing = [f for f in FILES if not os.path.exists(f)]
+if missing:
+    print("❗ 还没上传这些文件：", missing)
+    print("   本机路径：~/work/homework3/data/sft/git/（rag_context.json 在 ~/work/homework3/data/sft/）")
 train, test, test_para, train_para = (load(f) for f in FILES)
 print({k: len(v) for k, v in zip(["train","test","test_para","train_para"],
                                  [train, test, test_para, train_para])})
 if train:
-    print("样例：", train[0]["问题"], "→", train[0]["答案"][:60])""".replace("__REPO__", REPO)),
+    print("样例：", train[0]["问题"], "→", train[0]["答案"][:60])"""),
 
     code("""# ── 4. 载模型（主选 Qwen3.5-2B＝课件同款；失败自动退 Qwen3-1.7B）──
 import torch
