@@ -1,8 +1,211 @@
 {
-  "steps": 51,
-  "seconds": 526.1,
-  "trainable_params": 10090000,
-  "total_params_B": 0.61,
+  "steps": 48,
+  "seconds": 639.5,
+  "loss_log": [
+    {
+      "step": 1,
+      "loss": 3.3265
+    },
+    {
+      "step": 2,
+      "loss": 2.5849
+    },
+    {
+      "step": 3,
+      "loss": 2.3266
+    },
+    {
+      "step": 4,
+      "loss": 1.9941
+    },
+    {
+      "step": 5,
+      "loss": 2.6957
+    },
+    {
+      "step": 6,
+      "loss": 2.362
+    },
+    {
+      "step": 7,
+      "loss": 2.0232
+    },
+    {
+      "step": 8,
+      "loss": 2.1124
+    },
+    {
+      "step": 9,
+      "loss": 1.6346
+    },
+    {
+      "step": 10,
+      "loss": 1.3479
+    },
+    {
+      "step": 11,
+      "loss": 1.941
+    },
+    {
+      "step": 12,
+      "loss": 2.1578
+    },
+    {
+      "step": 13,
+      "loss": 2.1427
+    },
+    {
+      "step": 14,
+      "loss": 2.2496
+    },
+    {
+      "step": 15,
+      "loss": 2.3723
+    },
+    {
+      "step": 16,
+      "loss": 1.0671
+    },
+    {
+      "step": 17,
+      "loss": 1.7823
+    },
+    {
+      "step": 18,
+      "loss": 1.6744
+    },
+    {
+      "step": 19,
+      "loss": 1.4519
+    },
+    {
+      "step": 20,
+      "loss": 1.5279
+    },
+    {
+      "step": 21,
+      "loss": 1.9813
+    },
+    {
+      "step": 22,
+      "loss": 1.9998
+    },
+    {
+      "step": 23,
+      "loss": 1.3171
+    },
+    {
+      "step": 24,
+      "loss": 1.5566
+    },
+    {
+      "step": 25,
+      "loss": 1.1158
+    },
+    {
+      "step": 26,
+      "loss": 0.9294
+    },
+    {
+      "step": 27,
+      "loss": 1.4637
+    },
+    {
+      "step": 28,
+      "loss": 1.7142
+    },
+    {
+      "step": 29,
+      "loss": 1.6902
+    },
+    {
+      "step": 30,
+      "loss": 1.7633
+    },
+    {
+      "step": 31,
+      "loss": 2.0386
+    },
+    {
+      "step": 32,
+      "loss": 0.8671
+    },
+    {
+      "step": 33,
+      "loss": 1.1914
+    },
+    {
+      "step": 34,
+      "loss": 1.1074
+    },
+    {
+      "step": 35,
+      "loss": 1.2785
+    },
+    {
+      "step": 36,
+      "loss": 1.2826
+    },
+    {
+      "step": 37,
+      "loss": 1.5329
+    },
+    {
+      "step": 38,
+      "loss": 1.7695
+    },
+    {
+      "step": 39,
+      "loss": 1.0855
+    },
+    {
+      "step": 40,
+      "loss": 1.1407
+    },
+    {
+      "step": 41,
+      "loss": 0.8826
+    },
+    {
+      "step": 42,
+      "loss": 0.6093
+    },
+    {
+      "step": 43,
+      "loss": 1.0319
+    },
+    {
+      "step": 44,
+      "loss": 1.3787
+    },
+    {
+      "step": 45,
+      "loss": 1.3094
+    },
+    {
+      "step": 46,
+      "loss": 1.253
+    },
+    {
+      "step": 47,
+      "loss": 1.6963
+    },
+    {
+      "step": 48,
+      "loss": 0.7084
+    }
+  ],
+  "loss_first": 3.3265,
+  "loss_last": 0.7084,
+  "source": "mps/bf16",
+  "epochs": 3,
+  "lr": 0.0002,
+  "lora_r": 16,
+  "lora_alpha": 32,
+  "batch": 1,
+  "grad_accum": 16,
+  "max_len": 192,
+  "trainable_params": 10092544,
   "target_modules": [
     "q_proj",
     "k_proj",
@@ -11,28 +214,5 @@
     "gate_proj",
     "up_proj",
     "down_proj"
-  ],
-  "loss_first": 2.0868,
-  "loss_last": 1.3134,
-  "loss_all": [
-    2.0868,
-    3.3273,
-    1.1883,
-    1.5228,
-    3.4587,
-    1.4185,
-    2.9658,
-    1.3931,
-    0.8602,
-    1.0802,
-    1.3134
-  ],
-  "source": "本机 M2 / MPS / bf16 主干 + fp32 适配器",
-  "epochs": 3,
-  "lr": 0.0002,
-  "lora_r": 16,
-  "lora_alpha": 32,
-  "batch": 1,
-  "grad_accum": 16,
-  "max_len": 192
+  ]
 }

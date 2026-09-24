@@ -81,7 +81,8 @@ def score(pred: str, gold: str) -> dict:
 
 Q_TMPL = "投资者提问：{q}\n董秘回答："
 RAG_TMPL = ("你是贵州茅台董事会秘书。只依据下面材料回答投资者提问，数字要带单位，"
-            "材料没有就说没有。\n材料：{ctx}\n投资者提问：{q}\n董秘回答：")
+            "材料没有就说没有，并在末尾用「依据：《报告名》第 N 页」注明出处。"
+            "\n材料：{ctx}\n投资者提问：{q}\n董秘回答：")
 
 
 def load_jsonl(p: Path) -> list[dict]:
@@ -311,7 +312,9 @@ def main() -> None:
         print(f"  训练完成：{info['steps']} 步 / {info['seconds']}s")
         boss.save(adapter)
         (OUT / "train_info.json").write_text(json.dumps(
-            {**info, "loss_first": (info.get("loss_log") or [{}])[0].get("loss"),
+            {**{k: v for k, v in info.items() if k not in ("trainable", "targets")},
+             "trainable_params": info.get("trainable"), "target_modules": info.get("targets"),
+             "loss_first": (info.get("loss_log") or [{}])[0].get("loss"),
              "loss_last": (info.get("loss_log") or [{}])[-1].get("loss"),
              "source": f"{args.device}/{args.dtype}", "epochs": args.epochs,
              "lr": 2e-4, "lora_r": 16, "lora_alpha": 32,
