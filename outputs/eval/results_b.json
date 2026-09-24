@@ -1,0 +1,129 @@
+{
+  "summary": {
+    "训练前|格1_训练过_原问法": {
+      "n": 60,
+      "char_f1": 0.088,
+      "num_hit": 0.0,
+      "n_with_numbers": 8,
+      "refused": 2,
+      "len_ratio": 3.35
+    },
+    "训练前|格2_训练过_换问法": {
+      "n": 60,
+      "char_f1": 0.073,
+      "num_hit": 0.0,
+      "n_with_numbers": 10,
+      "refused": 2,
+      "len_ratio": 3.31
+    },
+    "训练前|格3_没训练过_原问法": {
+      "n": 50,
+      "char_f1": 0.111,
+      "num_hit": 0.0,
+      "n_with_numbers": 14,
+      "refused": 0,
+      "len_ratio": 2.32
+    },
+    "训练前|格4_没训练过_换问法": {
+      "n": 46,
+      "char_f1": 0.092,
+      "num_hit": 0.0,
+      "n_with_numbers": 13,
+      "refused": 0,
+      "len_ratio": 2.19
+    },
+    "训练前|格5_RAG对照_测试集": {
+      "n": 50,
+      "char_f1": 0.178,
+      "num_hit": 0.107,
+      "n_with_numbers": 14,
+      "refused": 0,
+      "len_ratio": 2.22
+    },
+    "训练后|格1_训练过_原问法": {
+      "n": 60,
+      "char_f1": 0.27,
+      "num_hit": 0.0,
+      "n_with_numbers": 8,
+      "refused": 0,
+      "len_ratio": 1.03
+    },
+    "训练后|格2_训练过_换问法": {
+      "n": 60,
+      "char_f1": 0.192,
+      "num_hit": 0.0,
+      "n_with_numbers": 10,
+      "refused": 0,
+      "len_ratio": 1.14
+    },
+    "训练后|格3_没训练过_原问法": {
+      "n": 50,
+      "char_f1": 0.198,
+      "num_hit": 0.0,
+      "n_with_numbers": 14,
+      "refused": 0,
+      "len_ratio": 0.83
+    },
+    "训练后|格4_没训练过_换问法": {
+      "n": 46,
+      "char_f1": 0.172,
+      "num_hit": 0.0,
+      "n_with_numbers": 13,
+      "refused": 0,
+      "len_ratio": 0.88
+    },
+    "训练后|格5_RAG对照_测试集": {
+      "n": 50,
+      "char_f1": 0.217,
+      "num_hit": 0.107,
+      "n_with_numbers": 14,
+      "refused": 0,
+      "len_ratio": 1.51
+    }
+  },
+  "n_rows": 532,
+  "metric": "char_bigram_f1(+num_hit/refused)",
+  "base_model": "Qwen3-0.6B",
+  "device": "mps",
+  "dtype": "bf16",
+  "train_info": {
+    "steps": 51,
+    "seconds": 526.1,
+    "trainable_params": 10090000,
+    "total_params_B": 0.61,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "loss_first": 2.0868,
+    "loss_last": 1.3134,
+    "loss_all": [
+      2.0868,
+      3.3273,
+      1.1883,
+      1.5228,
+      3.4587,
+      1.4185,
+      2.9658,
+      1.3931,
+      0.8602,
+      1.0802,
+      1.3134
+    ],
+    "source": "本机 M2 / MPS / bf16 主干 + fp32 适配器",
+    "epochs": 3,
+    "lr": 0.0002,
+    "lora_r": 16,
+    "lora_alpha": 32,
+    "batch": 1,
+    "grad_accum": 16,
+    "max_len": 192
+  },
+  "cap_per_cell": 60,
+  "loss_log": []
+}

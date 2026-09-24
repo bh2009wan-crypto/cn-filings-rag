@@ -36,28 +36,41 @@ def main() -> None:
         grid[cell][model] = v
 
     lines = ["# 作业 B · 四格对照（训练前 / 训练后）", "",
-             f"来源：`{src.name}`（{d.get('n_rows','?')} 条逐题记录）｜基座：{d.get('model','?')}", "",
-             "| 格 | 题数 | 训练前·数字命中率 | 训练后·数字命中率 | 训练前·误拒答 | 训练后·误拒答 |",
-             "|---|---|---|---|---|---|"]
+             f"来源：`{src.name}`（{d.get('n_rows','?')} 条逐题记录）｜基座：{d.get('base_model','?')}"
+             f"｜设备：{d.get('device','?')}｜精度：{d.get('dtype','?')}"
+             f"｜每格上限：{d.get('cap_per_cell','?')} 条",
+             "",
+             "| 格 | 题数 | **训练前·字符F1** | **训练后·字符F1** | 训练前·数字命中 | 训练后·数字命中 | 训练前·长度比 | 训练后·长度比 | 误拒答(前→后) |",
+             "|---|---|---|---|---|---|---|---|---|"]
     order = ["格1_训练过_原问法", "格2_训练过_换问法", "格3_没训练过_原问法",
              "格4_没训练过_换问法", "格5_RAG对照_测试集"]
     for cell in order:
         if cell not in grid:
             continue
-        b, a = grid[cell].get("训练前"), grid[cell].get("训练后")
-        for m, side in (("训练前", b), ("训练后", a)):
-            if side and side.get("n", 0) >= 1000:      # 防误读（n 明显不对时提示）
-                side["n"] = f"{side['n']}⚠️"
-        lines.append(f"| {cell} | {(b or a or {}).get('n','?')} | "
-                     f"{(b or {}).get('num_hit','-')} | {(a or {}).get('num_hit','-')} | "
-                     f"{(b or {}).get('refused','-')} | {(a or {}).get('refused','-')} |")
+        b, a = grid[cell].get("训练前", {}), grid[cell].get("训练后", {})
+        lines.append(
+            f"| {cell} | {(b or a).get('n','?')} "
+            f"| {(b or {}).get('char_f1','-')} | {(a or {}).get('char_f1','-')} "
+            f"| {(b or {}).get('num_hit','-')}（{(b or {}).get('n_with_numbers','-')} 题） "
+            f"| {(a or {}).get('num_hit','-')}（{(a or {}).get('n_with_numbers','-')} 题） "
+            f"| {(b or {}).get('len_ratio','-')} | {(a or {}).get('len_ratio','-')} "
+            f"| {(b or {}).get('refused','-')} → {(a or {}).get('refused','-')} |")
+
+    ti = d.get("train_info") or {}
+    if ti:
+        lines += ["", "**训练配置**：" +
+                  f"步数 {ti.get('steps','?')}｜耗时 {ti.get('seconds','?')}s｜" +
+                  f"可训练参数 {ti.get('trainable_params',0)/1e6:.2f}M｜" +
+                  f"target_modules {','.join(ti.get('target_modules') or [])}"]
 
     lines += ["", "## 怎么读", "",
-              "- **格1 应显著高于格3**：教过的事实能答，没教过的答不了——这是 SFT 的「能与界」。",
+              "- **主指标是字符 bigram F1**（金答案里 68% 根本没有数字，只看数字命中会全是 0）。",
+              "- **格1 应显著高于格3**：教过的事实能答，没教过的答不了——SFT 的「能与界」。",
               "- **格2 若明显低于格1**：说明它背的是问法，不是事实（课件实测：原题 100%、换问法 78%）。",
               "- **格5（RAG 对照）** = 同一基座 + 检索原文：若格5 不输格3，说明这类问题该建库而不是微调。",
-              "- 数字命中率 = 金标准答案里的数字被答出来的比例（确定性、可复现）。",
-              "- 误拒答 = 原文里有、它却说「没有相关内容」——课件里这是高发错误（模型内部日期会骗它）。"]
+              "- **长度比**接近 1 说明学会了「答多长」，显著大于 1 说明还在啰嗦。",
+              "- 误拒答 = 原文里有、它却说「没有相关内容」。",
+              "- ⚠️ 基座是 **Qwen3-0.6B**（本机 M2 能跑得动的最大选择），课件用的是 Qwen3.5-2B——容量差异会影响绝对分数。"]
 
     out = OUT_DIR / "B_对照表.md"
     out.parent.mkdir(parents=True, exist_ok=True)

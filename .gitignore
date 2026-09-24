@@ -10,6 +10,8 @@ outputs/*
 outputs/eval/*
 !outputs/eval/*.csv
 !outputs/eval/*.md
+!outputs/eval/results_b.json
+!outputs/eval/train_info.json
 
 # ===== 财报原件与派生的大文件（不入库；README 里写明怎么重新生成）=====
 data/pdf/
