@@ -6,6 +6,7 @@ logs/
 outputs/*
 !outputs/*.md
 !outputs/*.png
+!outputs/eval/
 outputs/eval/*
 !outputs/eval/*.csv
 !outputs/eval/*.md
