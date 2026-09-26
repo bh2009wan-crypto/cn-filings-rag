@@ -24,7 +24,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from config import ROOT  # noqa: E402
 
 NB = ROOT / "notebooks" / "maotai_dongmi_lora.ipynb"
-REPO = "https://raw.githubusercontent.com/bh2009wan-crypto/homework3/main"
 
 
 def md(text: str) -> dict:
@@ -41,15 +40,16 @@ CELLS = [
 
 **做法对齐课件**：造数据（提问/作答/质检三角色同一个便宜模型）→ Colab 免费 T4 上 LoRA 微调 → 四格对照。
 
-## 🚀 怎么跑（三步）
+## 🚀 怎么跑（四步）
 
-1. 先把 5 个文件上传到这个 notebook 的工作目录（左侧「文件」图标 → 上传；本机路径见下）：
-   - `~/work/homework3/data/sft/git/` 下的 `train.jsonl`、`test.jsonl`、`train_para.jsonl`、`test_para.jsonl`
-   - `~/work/homework3/data/sft/rag_context.json`（格5 用；不传就跳过格5）
+1. **数据不用上传**——仓库已公开，4 个数据文件在第 3 格自动从 raw 链接拉取。
+   唯一例外是 `rag_context.json`（生成物，没入库）：想跑格5 就把本机 `~/work/homework3/data/sft/rag_context.json` 上传到 `/content/`，不传就跳过格5。
 2. 菜单 **代码执行程序 → 更改运行时类型 → 选 T4 GPU**（免费）
 3. **全部运行**（Runtime → Run all）。约 **40 分钟**（训练 ~15 分钟 + 前后各一次评估 ~25 分钟）
-4. 跑完会自动下载 `results_b.json` / `results_b.csv` / `results_b_summary.md` → 把 `results_b.json` 放到本机 `~/work/homework3/outputs/eval/`，然后执行
-   `python scripts/22_run_eval_b.py` 生成 `outputs/B_对照表.md`
+4. 跑完会自动下载 `results_b.json` / `results_b.csv` / `results_b_summary.md`（默认落到 `~/Downloads/`），然后执行
+   `python scripts/22_run_eval_b.py` 生成/更新 `outputs/B_对照表.md`
+   ⚠️ 现在这份 `outputs/B_对照表.md` 是**本机 M2** 那一版（结论里的数字都出自它）。想跑 Colab 版做对比，
+   **先把 `B_对照表.md` 备份成别的名字**，否则会被直接覆盖、两版数字混在一起。
 
 **跑挂了怎么办**：
 - 第 8 格训练报错（模型不兼容）→ 把第 4 格的 `PRIMARY` 改成 `"Qwen/Qwen3-1.7B"`，重新 Run all
@@ -85,20 +85,30 @@ import transformers, peft, trl
 print("transformers", transformers.__version__, "| peft", peft.__version__, "| trl", trl.__version__)"""),
 
     code("""# ── 3. 取数据 ──────────────────────────────────────────────
-# ⚠️ 仓库是**私有**的，raw 链接取不到 → 请在 Colab 左侧「文件」面板把这 5 个文件上传到 /content/：
-#     data/sft/git/train.jsonl      data/sft/git/test.jsonl
-#     data/sft/git/train_para.jsonl data/sft/git/test_para.jsonl
-#     data/sft/rag_context.json        ← 本机 scripts/16_dump_rag_for_b.py 生成（格5 用；没有就跳过格5）
-# 也可以用 token 拉（可选）：
-#     import subprocess; subprocess.run(["git","clone","https://<token>@github.com/bh2009wan-crypto/homework3.git"])
-import os, json
+# 仓库已公开（2026-09-25 由 homework3 改名并公开）→ 4 个数据文件直接从 raw 链接拉，不用上传、不用 token。
+# 用**新**仓库名 cn-filings-rag；旧名 homework3 的 raw 链接实测仍能 200 重定向，但新名更稳妥。
+# 唯一要手动传的是 rag_context.json（生成物，没入库）：想跑格5 就把本机的
+#     ~/work/homework3/data/sft/rag_context.json
+# 上传到 /content/；不传就自动跳过格5。
+import os, json, urllib.request
+REPO = "https://raw.githubusercontent.com/bh2009wan-crypto/cn-filings-rag/main"
 FILES = ["train.jsonl", "test.jsonl", "test_para.jsonl", "train_para.jsonl"]
+
 def load(p):
     return [json.loads(l) for l in open(p, encoding="utf-8") if l.strip()] if os.path.exists(p) else []
+
+for f in FILES:
+    if not os.path.exists(f):
+        try:
+            urllib.request.urlretrieve(f"{REPO}/data/sft/git/{f}", f)
+            print("⬇️ 已拉取", f)
+        except Exception as e:
+            print("❗ 拉取失败", f, type(e).__name__, str(e)[:120])
+
 missing = [f for f in FILES if not os.path.exists(f)]
-if missing:
-    print("❗ 还没上传这些文件：", missing)
-    print("   本机路径：~/work/homework3/data/sft/git/（rag_context.json 在 ~/work/homework3/data/sft/）")
+if missing:   # 只有 raw 链接也失败（网络问题）时，才需要手动上传
+    print("❗ 请手动上传：", missing, "（本机在 ~/work/homework3/data/sft/git/）")
+
 train, test, test_para, train_para = (load(f) for f in FILES)
 print({k: len(v) for k, v in zip(["train","test","test_para","train_para"],
                                  [train, test, test_para, train_para])})

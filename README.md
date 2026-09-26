@@ -8,14 +8,14 @@
 
 | # | 交付物 | 状态 |
 |---|---|---|
-| A | 代码仓库（本仓库，私有） | ✅ `github.com/bh2009wan-crypto/cn-filings-rag` |
+| A | 代码仓库（**本仓库，已公开**） | ✅ `github.com/bh2009wan-crypto/cn-filings-rag` |
 | A | 11 家 × 2026 半年报的知识库（向量 + BM25） | ✅ 4,462 块，向量 + BM25 双索引 |
 | A | 问答页面（能提问、答案带出处） | ✅ `scripts/08_app.py`（答案带角标 + 证据卡片 + 数字核对） |
 | A | 页面截图 | ✅ `outputs/A_页面截图.png`、`outputs/A_页面截图_回答.png` |
 | A | 10 道题逐题记录（召回块 / 对错 / 错在哪） | ✅ `outputs/eval/results_a.csv`（含人工判分列） |
 | A | 一页结论 | ✅ `docs/结论A_一页.md`（单公司 8/8，跨公司全景 0/2） |
-| B | 造数据脚本 + 抽检记录 | 数据 ✅（质检 312 → 人工抽检弃用 14 → **298 条**；训练 254 / 测试 44；换问法 246 与 44；答案带出处引用）；**抽检需你终审 40 条** `data/sft/review_40.csv` |
-| B | 训练笔记本 | ✅ `notebooks/maotai_dongmi_lora.ipynb`（Colab 免费 T4；数据需手动上传，仓库是私有的）<br>**交付清单见 `docs/交作业清单.md`** |
+| B | 造数据脚本 + 抽检记录 | ✅ 质检 312 → 人工抽检弃用 14 → **298 条**；训练 254 / 测试 44；换问法 246 与 44；答案带出处引用。抽检 40 条**已终审完毕**（26 留 / 14 删），见 `docs/抽检记录.md` + `data/sft/review_40.csv` |
+| B | 训练笔记本 | ✅ `notebooks/maotai_dongmi_lora.ipynb`（Colab 免费 T4；仓库已公开，4 个数据文件自动拉取，只有 `rag_context.json` 需手动上传）<br>**交付清单见 `docs/交作业清单.md`** |
 | B | 四格对照表 + 一页结论 | ✅ **本机 M2 跑完**：`outputs/B_对照表.md`、`docs/结论B_一页.md`（基座 Qwen3-0.6B；格式学会、事实学不会；Colab 版笔记本仍可用） |
 | B | 本机训练脚本（Colab 被网络卡死后的替代路） | ✅ `scripts/23_local_sft_mps.py`（分阶段跑，bf16，51 步 / 8.8 分钟） |
 

@@ -3,6 +3,11 @@
 > 题目**先冻结后跑**：`eval/questions_a.json` 冻结于 2026-09-24 15:00:48，
 > SHA256 `6b218eeda95c9fc3bba54ecce31e049b2def90a5cd09d0bbd023a8718e4cd049`（见 `eval/questions_a.sha256`，入库）。
 > 冻结之后**没有改过任何一道题**；参考要点 `eval/key_facts.json` 里的每个数字都是从财报原文摘的。
+>
+> ⚠️ **怎么复核**：冻存的是**规范化内容**的哈希——每题只取 `id/type/question/must_refuse` 四个字段（剔除 `note`），
+> 按 `sort_keys=True, separators=(",",":"), ensure_ascii=False` 序列化后取 SHA256。
+> 直接对整文件跑 `shasum -a 256 eval/questions_a.json` 会得到 `076052f6…`，那是**口径不同**，不代表改过题。
+> 复现见 `scripts/20_build_eval_set.py` 的 `canonical()`。
 
 ## 一、语料与索引（做了什么）
 

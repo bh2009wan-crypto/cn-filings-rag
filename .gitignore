@@ -38,6 +38,9 @@ data/sft/*.jsonl
 data/sft/qc_cache.json
 data/sft/rag_context.json
 
+# 交平台用的提交包（生成物，重跑 scripts/24_make_submission_A.py 即可；不必随仓库公开）
+提交_A/
+
 # ===== Python =====
 __pycache__/
 *.pyc
