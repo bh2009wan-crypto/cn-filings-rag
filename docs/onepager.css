@@ -1,0 +1,86 @@
+/* 作业 3 A 方向「一页结论」专用样式。
+ *
+ * 两个约束都是硬性的：
+ *  ① 只能出一页 —— 所以不写 page-break、不写封面，字号压到 9.5pt，表格紧凑。
+ *  ② PDF 的文字层必须能搜 —— 中文字体只能用下面这一栏。
+ *     Chrome 打印时 PingFang SC / Songti SC / Heiti SC / Hiragino Sans GB 的
+ *     ToUnicode 映射是错的：页面看着完全正常，但复制/搜索出来是乱码。
+ *     实测可用：STHeiti（黑体-简）/ Lantinghei SC（兰亭黑）/ Arial Unicode MS。
+ */
+
+@page { size: A4; margin: 9mm 10mm; }
+
+html { font-size: 8.4pt; }
+
+body {
+  font-family: "STHeiti", "Lantinghei SC", "Arial Unicode MS", sans-serif;
+  line-height: 1.26;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+h1 { font-size: 13pt; margin: 0 0 .8mm; letter-spacing: .2px; }
+
+/* pandoc --standalone 会自作主张加一块标题（--metadata title），跟正文的一级标题重复。
+   藏掉它，标题以正文里的那个为准。 */
+#title-block-header { display: none; }
+h2 {
+  font-size: 9.6pt;
+  margin: 2.4mm 0 .9mm;
+  padding-bottom: .5mm;
+  border-bottom: 1px solid #b9c3cf;
+  color: #1d3c5e;
+}
+h2:first-of-type { margin-top: 1.6mm; }
+
+p { margin: 0 0 1.2mm; }
+
+.meta {
+  display: block;
+  font-size: .8em;
+  color: #4a4a4a;
+  line-height: 1.32;
+  margin-bottom: .8mm;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: .78em;
+  margin: 0 0 1.2mm;
+  page-break-inside: avoid;
+}
+th, td {
+  border: 1px solid #c9d2dc;
+  padding: .45mm 1.1mm;
+  text-align: left;
+  vertical-align: top;
+}
+th { background: #eef2f7; font-weight: 600; }
+td.num { text-align: right; white-space: nowrap; }
+td.c { text-align: center; }
+
+code {
+  font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: .88em;
+  background: #f4f6f9;
+  padding: 0 .4mm;
+  border-radius: 2px;
+}
+
+blockquote {
+  margin: 1.2mm 0;
+  padding: 1mm 2mm;
+  border-left: 2.5px solid #2a5580;
+  background: #f6f9fc;
+  font-size: .88em;
+  color: #23384d;
+}
+blockquote p { margin: 0; }
+
+ol, ul { margin: 0 0 1.6mm; padding-left: 5mm; }
+li { margin-bottom: .4mm; }
+
+.foot { font-size: .78em; color: #666; margin-top: 2mm; }
+.bad { color: #b3261e; font-weight: 600; }
+.good { color: #0a7a3d; font-weight: 600; }
