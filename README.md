@@ -13,11 +13,11 @@
 | A | 问答页面（能提问、答案带出处） | ✅ `scripts/08_app.py`（答案带角标 + 证据卡片 + 数字核对） |
 | A | 页面截图 | ✅ `outputs/A_页面截图.png`、`outputs/A_页面截图_回答.png` |
 | A | 10 道题逐题记录（召回块 / 对错 / 错在哪） | ✅ `outputs/eval/results_a.csv`（含人工判分列） |
-| A | 一页结论 | ✅ `docs/结论A_一页.md`（单公司 8/8，跨公司全景 0/2） |
+| A | 一页结论 | ✅ `docs/结论A_一页.md`（详细版）＋ **`docs/作业3_A一页结论.pdf`**（**一页 PDF**，批改要求补的；含口径核对表与全景取证矩阵） |
 | B | 造数据脚本 + 抽检记录 | ✅ 质检 312 → 人工抽检弃用 14 → **298 条**；训练 254 / 测试 44；换问法 246 与 44；答案带出处引用。抽检 40 条**已终审完毕**（26 留 / 14 删），见 `docs/抽检记录.md` + `data/sft/review_40.csv` |
 | B | 训练笔记本 | ✅ `notebooks/maotai_dongmi_lora.ipynb`（Colab 免费 T4；仓库已公开，4 个数据文件自动拉取，只有 `rag_context.json` 需手动上传）<br>**交付清单见 `docs/交作业清单.md`** |
 | B | 四格对照表 + 一页结论 | ✅ **本机 M2 跑完**：`outputs/B_对照表.md`、`docs/结论B_一页.md`（基座 Qwen3-0.6B；格式学会、事实学不会；Colab 版笔记本仍可用） |
-| B | 本机训练脚本（Colab 被网络卡死后的替代路） | ✅ `scripts/23_local_sft_mps.py`（分阶段跑，bf16，51 步 / 8.8 分钟） |
+| B | 本机训练脚本（Colab 被网络卡死后的替代路） | ✅ `scripts/23_local_sft_mps.py`（分阶段跑，bf16，**48 步 / 639 秒 ≈ 10.7 分钟**；训练环境与依赖版本见 `docs/结论B_一页.md` 第二节） |
 
 > 状态如实写：**没跑完的不打勾**。
 
@@ -26,17 +26,18 @@
 | 课件要求的交付物 | 文件 |
 |---|---|
 | A · 代码仓库 | 本仓库 |
-| A · 页面截图 | `outputs/A_页面截图.png`（首页）、`outputs/A_页面截图_回答.png`（带证据卡片的回答） |
-| A · 一页结论 | `docs/结论A_一页.md` |
+| A · 页面截图 | `outputs/A_页面截图.png`（首页）、`outputs/A_页面截图_回答.png`（Q9 回答 + 证据卡片）、`outputs/A_页面截图_回答_Q10.png`（Q10）。**两张回答截图与 `results_a.csv` 出自同一次运行** |
+| A · 一页结论 | `docs/结论A_一页.md`（详细版）＋ **`docs/作业3_A一页结论.pdf`**（一页 PDF，`scripts/26_make_a_onepager_pdf.sh` 生成） |
 | A · 10 题逐题记录 | `outputs/eval/results_a.csv`（+ 可复核的判分脚本 `scripts/19_verdict_a.py`） |
+| A · 召回／答案／口径／取证 四张分表 | `outputs/eval/表1_召回评价.md`、`表2_答案表现.md`、`表3_口径核对.md`、`表4_全景取证矩阵.md`（`scripts/25_make_a_tables.py` 生成） |
 | A · 冻结的题与参考要点 | `eval/questions_a.json`、`eval/questions_a.sha256`、`eval/key_facts.json` |
 | B · 数据生成脚本 | `scripts/10_gen_qa.py`、`scripts/11_qc_qa.py` |
-| B · 人工抽检记录 | `docs/抽检记录.md` + `data/sft/review_40.csv`（**待你填判定列**） |
+| B · 人工抽检记录 | `docs/抽检记录.md` + `data/sft/review_40.csv`（40 条判定列**已填完**：26 留 / 14 删） |
 | B · 训练笔记本 | `notebooks/maotai_dongmi_lora.ipynb` |
-| B · 对照表 | `outputs/B_对照表.md`（等 Colab 结果） |
+| B · 对照表 | `outputs/B_对照表.md`（**本机 M2 已跑完**，Colab 是可选加分项） |
 | B · 一页结论 | `docs/结论B_一页.md` |
 | 附 · 踩坑复盘（不在要求里，但对同类项目有用） | `docs/踩坑复盘.md`（14 条） |
-| 附 · 你要做的两步（Colab 可选 + 人工抽检） | `docs/你要做的两步.md` |
+| 附 · 交付与可选加分项清单 | `docs/交作业清单.md`（**已取代**早先的「你要做的两步」，那份文件已删除） |
 
 ## 课件要求 ↔ 实现 对照
 
@@ -48,7 +49,7 @@
 | ② 提取文字，表格按行列还原；切块时带上公司、章节、页码 | pdfplumber 抽正文 + 表格还原（含跨页表合并）；切块 800 字 / 重合 120，四标签 | `03_parse_pdf.py`、`04_chunk.py` |
 | ③ 建向量 ＋ BM25 索引，做一个能提问、答案带出处的问答页面 | Qwen3-Embedding-0.6B + 自实现 BM25 → RRF 融合 → Flask 页面（答案带 `[n]` 角标 + 证据卡片） | `05_build_bm25.py`、`06_embed.py`、`ask_lib.py`、`08_app.py` |
 | ④ 出 10 道题（至少 2 道跨公司全景题），逐题记录 | 10 道（含 2 道跨公司全景）+ 1 道附加拒答题；**先冻题再跑**（哈希入库） | `20_build_eval_set.py`、`21_run_eval_a.py` |
-| 交付：代码仓库 ＋ 页面截图 ＋ 一页结论 | 本仓库 + `outputs/A_页面截图*.png` + `docs/结论A_一页.md` | `09_screenshot.py` |
+| 交付：代码仓库 ＋ 页面截图 ＋ 一页结论 | 本仓库 + `outputs/A_页面截图*.png` + `docs/结论A_一页.md` ＋ **`docs/作业3_A一页结论.pdf`** | `09_screenshot.py`、`26_make_a_onepager_pdf.sh` |
 
 ### B · 用财报训练一个「董秘」
 
